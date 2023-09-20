@@ -1,8 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 
-const { PORT = 3000 } = process.env;
-
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -12,9 +10,13 @@ const cookieParser = require('cookie-parser');
 const routes = require('./router/routes');
 const { error500 } = require('./middlewares/error');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const {
+  PORT,
+  mongoDB,
+} = require('./utils/config');
 const limiter = require('./utils/limiter');
 // подключение к серверу монго
-const mongoDB = 'mongodb://127.0.0.1:27017/bitfilmsdb';
+
 mongoose.connect(mongoDB, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -26,8 +28,12 @@ mongoose.Promise = global.Promise;
 app.use(cors({
   origin: [
     'https://api.vkoenen.movies.nomoredomainsrocks.ru',
+    'http://api.vkoenen.movies.nomoredomainsrocks.ru',
     'https://vkoenen.movies.nomoredomainsrocks.ru',
-    'https://api.vkoenen.movies.nomoredomainsrocks.ru',
+    'http://vkoenen.movies.nomoredomainsrocks.ru',
+    'http://localhost:3000',
+    'http://localhost:3001',
+    '*',
   ], // порт (потом добавить домен, когда присвоится)
   credentials: true, // куки
   methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'],
@@ -53,7 +59,7 @@ app.get('/crash-test', () => {
     throw new Error('Сервер сейчас упадёт');
   }, 0);
 });
-
+// подключаем лимитер
 app.use(limiter);
 
 app.use(routes);

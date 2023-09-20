@@ -22,7 +22,7 @@ module.exports.createMovie = (req, res, next) => {
 
 // получение карточек
 module.exports.getMovies = (req, res, next) => {
-  Movie.find({})
+  Movie.find({ owner: req.user.id })
     .then((movie) => res.send(movie))
     .catch(next);
 };

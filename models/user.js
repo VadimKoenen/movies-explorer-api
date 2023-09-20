@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     minlength: [2, 'Must be at least 2, got {VALUE}'],
     maxlength: [30, 'Must be at most 30, got {VALUE}'],
-    default: 'Жак-Ив Кусто',
+    required: true,
   },
 
   email: {

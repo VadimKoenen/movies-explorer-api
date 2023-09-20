@@ -36,6 +36,9 @@ module.exports.createUser = (req, res, next) => {
       if (err.code === 11000) {
         return next(new CONFLICT('User already is registred'));
       }
+      if (err.name === 'ValidationError') {
+        return next(new BAD_REQUEST('Uncorrect data'));
+      }
       return next(err);
     });
 };
@@ -66,9 +69,12 @@ module.exports.updateProfile = (req, res, next) => {
       runValidators: true,
     },
   )
+    .orFail(() => new NOT_FOUND('User not found'))
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.code === 11000) {
+        return next(new CONFLICT('User already is registred'));
+      } if (err.name === 'ValidationError') {
         return next(new BAD_REQUEST('Uncorrect data'));
       }
       return next(err);
