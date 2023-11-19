@@ -100,14 +100,15 @@ module.exports.login = (req, res, next) => {
                 id: user._id,
               },
               NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+              { expiresIn: '7d' },
             );
             // кука
             res.cookie('jwt', token, {
-              maxAge: 360000,
+              maxAge: 3660000 * 24 * 7,
               httpOnly: true,
-              sameSite: true,
+              sameSite: 'Strict',
             });
-            return res.send({ data: user.toJSON() });
+            return res.send(user.toJSON());
           }
           return next(new UNAUTHORIZED('Invalid email or password'));
         });
@@ -125,6 +126,9 @@ module.exports.getUserData = (req, res, next) => {
 
 //
 module.exports.logout = (req, res, next) => {
-  res.clearCookie('jwt').send({ message: 'Logout' })
-    .catch(next);
+  try {
+    res.clearCookie('jwt').send({ message: 'Logout' });
+  } catch (err) {
+    next(err);
+  }
 };
